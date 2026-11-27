@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html lang="en" class="dark scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RayTrace AI | Dynamic Solar Recycling & Photonics Triage Portfolio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        obsidian: '#050912',
+                        slatepanel: '#0c1322',
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'laser-sweep': 'laserSweep 3s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        laserSweep: {
+                            '0%, 100%': { transform: 'translateY(0%)', opacity: '0.8' },
+                            '50%': { transform: 'translateY(100%)', opacity: '1' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #050912;
+            color: #f8fafc;
+            background-image:
+                radial-gradient(circle at 12% 8%, rgba(56, 189, 248, 0.12), transparent 36%),
+                radial-gradient(circle at 88% 42%, rgba(16, 185, 129, 0.08), transparent 38%),
+                linear-gradient(rgba(148, 163, 184, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(148, 163, 184, 0.03) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 40px 40px, 40px 40px;
+        }
+
+        .glass-card {
+            background: rgba(15, 23, 42, 0.72);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(148, 163, 184, 0.14);
+        }
+
+        .glass-card-hover {
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .glass-card-hover:hover {
+            border-color: rgba(56, 189, 248, 0.38);
+            transform: translateY(-2px);
+            box-shadow: 0 16px 40px -12px rgba(2, 132, 199, 0.22);
+        }
+
+        /* Custom Range Slider */
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            background: rgba(30, 41, 59, 0.9);
+            height: 8px;
+            border-radius: 999px;
+            border: 1px solid rgba(56, 189, 248, 0.25);
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #38bdf8;
+            cursor: pointer;
+            box-shadow: 0 0 14px rgba(56, 189, 248, 0.8);
+            border: 2px solid #ffffff;
+        }
+
+        /* Animated SVG Laser Path */
+        .laser-stroke {
+            stroke-dasharray: 12 6;
+            animation: dashFlow 1.4s linear infinite;
+        }
+        @keyframes dashFlow {
+            to { stroke-dashoffset: -36; }
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-sky-500/30 selection:text-sky-200 overflow-x-hidden">
+
+    <!-- Sticky Navigation Bar -->
+    <nav class="sticky top-0 z-50 border-b border-slate-800/80 bg-obsidian/80 backdrop-blur-xl">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <a href="#" class="flex items-center gap-3 group">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-sky-500 to-cyan-400 flex items-center justify-center shadow-lg shadow-sky-500/25">
+                    <svg class="w-5 h-5 text-slate-950" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24">
+                        <rect x="3" y="3" width="18" height="18" rx="2"/>
+                        <line x1="3" y1="9" x2="21" y2="9"/>
+                        <line x1="3" y1="15" x2="21" y2="15"/>
+                        <line x1="9" y1="3" x2="9" y2="21"/>
+                        <line x1="15" y1="3" x2="15" y2="21"/>
+                    </svg>
+                </div>
+                <div>
+                    <span class="font-bold text-lg tracking-tight text-white">RayTrace <span class="text-sky-400">AI</span></span>
+                    <span class="hidden sm:inline-block ml-2 text-[11px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-full bg-sky-500/10 text-sky-400 border border-sky-500/20">v2.4 Dual-Model</span>
+                </div>
+            </a>
+
+            <div class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
+                <a href="#problem" class="hover:text-sky-400 transition-colors">The Static Flaw</a>
+                <a href="#simulator" class="hover:text-sky-400 transition-colors">INR Simulator</a>
+                <a href="#unit-economics" class="hover:text-sky-400 transition-colors">Unit Economics (₹)</a>
+                <a href="#architecture" class="hover:text-sky-400 transition-colors">Dual-Model Engine</a>
+                <a href="#benchmarks" class="hover:text-sky-400 transition-colors">Benchmark Matrix</a>
+            </div>
+
+            <a href="#simulator" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-semibold text-xs sm:text-sm transition-all shadow-lg shadow-sky-500/20">
+                <span>Launch Simulator</span>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+            </a>
+        </div>
+    </nav>
+
+    <!-- 1. HERO SECTION -->
+    <section class="relative pt-16 pb-20 sm:pt-24 sm:pb-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div class="grid lg:grid-cols-12 gap-12 items-center">
+            <div class="lg:col-span-7 space-y-6">
+                <div class="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-300 text-xs font-mono">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                    CIRCULAR PHOTOVOLTAICS &bull; INDIA PV E-WASTE OPTIMIZER
+                </div>
+
+                <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.1] text-white">
+                    Stop Crushing <span class="bg-gradient-to-r from-sky-400 via-cyan-300 to-emerald-400 bg-clip-text text-transparent">Intact Solar Glass</span> &amp; Wafers.
+                </h1>
+
+                <p class="text-base sm:text-lg text-slate-300 leading-relaxed max-w-2xl">
+                    Conventional Indian solar recycling plants spend <span class="text-rose-300 font-mono font-semibold">₹883–₹1,079/module</span> crushing end-of-life panels into low-grade cullet at a net unit loss. <strong class="text-white">RayTrace AI</strong> combines a <span class="text-sky-300 font-mono">96.89%</span> ResNet50 classifier with Random Forest yield estimation and DP laser trajectory planning to unlock <span class="text-emerald-300 font-mono font-semibold">+₹1,170/module</span> net profit.
+                </p>
+
+                <div class="flex flex-wrap items-center gap-4 pt-2">
+                    <a href="#simulator" class="px-6 py-3.5 rounded-xl bg-gradient-to-r from-sky-500 to-cyan-400 hover:from-sky-400 hover:to-cyan-300 text-slate-950 font-bold text-sm sm:text-base shadow-xl shadow-sky-500/25 transition-all flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                        Simulate INR Batch Recovery
+                    </a>
+                    <a href="#unit-economics" class="px-6 py-3.5 rounded-xl glass-card hover:border-slate-600 text-slate-200 font-semibold text-sm sm:text-base transition-all">
+                        View ₹/Module Cost Breakdown
+                    </a>
+                </div>
+
+                <!-- Hero Live KPI Strip -->
+                <div class="grid grid-cols-3 gap-4 pt-6 border-t border-slate-800/80">
+                    <div>
+                        <div class="text-2xl sm:text-3xl font-extrabold font-mono text-emerald-400">96.89%</div>
+                        <div class="text-xs sm:text-sm text-slate-400 mt-1">ResNet50 Val Accuracy</div>
+                    </div>
+                    <div>
+                        <div class="text-2xl sm:text-3xl font-extrabold font-mono text-sky-400">+₹1,170</div>
+                        <div class="text-xs sm:text-sm text-slate-400 mt-1">Net Margin / Clean Panel</div>
+                    </div>
+                    <div>
+                        <div class="text-2xl sm:text-3xl font-extrabold font-mono text-amber-400">-57.0%</div>
+                        <div class="text-xs sm:text-sm text-slate-400 mt-1">Processing Cost vs. Static</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Hero Card: Live Triage Pipeline Preview -->
+            <div class="lg:col-span-5">
+                <div class="glass-card rounded-2xl p-6 shadow-2xl border-sky-500/25 relative overflow-hidden">
+                    <div class="flex items-center justify-between pb-4 mb-5 border-b border-slate-800">
+                        <div class="flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-full bg-rose-500/80"></span>
+                            <span class="w-3 h-3 rounded-full bg-amber-500/80"></span>
+                            <span class="w-3 h-3 rounded-full bg-emerald-500/80"></span>
+                            <span class="ml-2 text-xs font-mono text-slate-400">raytrace_triage_engine.py</span>
+                        </div>
+                        <span class="text-[11px] font-mono px-2.5 py-0.5 rounded-md bg-sky-500/15 text-sky-300 border border-sky-500/30">ACTIVE INFERENCE</span>
+                    </div>
+
+                    <div class="space-y-3.5">
+                        <!-- Path A -->
+                        <div class="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-start gap-3.5">
+                            <div class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-mono font-bold text-sm shrink-0">A</div>
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <h3 class="text-sm font-bold text-emerald-300">Clean / Good Condition</h3>
+                                    <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-200">FULL LASER PATH</span>
+                                </div>
+                                <p class="text-xs text-slate-300 mt-1">Retains <span class="text-white font-semibold">100% tempered glass, intact silicon wafers, and Ag/Cu busbars</span> via full DP matrix separation.</p>
+                            </div>
+                        </div>
+
+                        <!-- Path B -->
+                        <div class="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-start gap-3.5">
+                            <div class="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center font-mono font-bold text-sm shrink-0">B</div>
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <h3 class="text-sm font-bold text-amber-300">Electrically Faulty</h3>
+                                    <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-500/20 text-amber-200">PERIMETER GLASS CUT</span>
+                                </div>
+                                <p class="text-xs text-slate-300 mt-1">Executes outer glass delamination to <span class="text-white font-semibold">save the intact glass sheet</span> while excluding damaged semiconductors.</p>
+                            </div>
+                        </div>
+
+                        <!-- Path C -->
+                        <div class="p-4 rounded-xl bg-rose-500/10 border border-rose-500/30 flex items-start gap-3.5">
+                            <div class="w-8 h-8 rounded-lg bg-rose-500/20 text-rose-400 flex items-center justify-center font-mono font-bold text-sm shrink-0">C</div>
+                            <div>
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <h3 class="text-sm font-bold text-rose-300">Physical Damage / Hybrid Defect</h3>
+                                    <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-rose-500/20 text-rose-200">THERMAL + CRUSH</span>
+                                </div>
+                                <p class="text-xs text-slate-300 mt-1">Bypasses laser energy completely; routes shattered panels to <span class="text-white font-semibold">EVA heating &amp; mechanical glass crushing</span>. <span class="text-rose-200 font-medium">If both electrical and physical defects are present, the process proceeds with the physical defect pathway (Path C) because the front glass cannot be retrieved intact.</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. THE PROBLEM WITH STATIC MODELS -->
+    <section id="problem" class="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-slate-800/70">
+        <div class="max-w-3xl mb-12">
+            <span class="text-xs font-mono uppercase tracking-widest text-rose-400 font-semibold">The Industry Bottleneck</span>
+            <h2 class="text-3xl sm:text-4xl font-bold text-white mt-2">Why Current "One-Size-Fits-All" Recycling Fails</h2>
+            <p class="text-slate-400 mt-3 text-base">
+                Over 70% of decommissioned solar modules still possess structurally intact low-iron tempered glass and reusable silicon cells—yet conventional plants destroy them with static batch processing.
+            </p>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-6">
+            <!-- Conventional Static Card -->
+            <div class="glass-card rounded-2xl p-6 sm:p-8 border-rose-500/25">
+                <div class="flex items-center justify-between mb-4">
+                    <span class="px-3 py-1 rounded-full bg-rose-500/15 text-rose-300 text-xs font-mono font-semibold border border-rose-500/30">CONVENTIONAL STATIC PIPELINE</span>
+                    <span class="text-rose-400 font-mono text-sm font-bold">0% Triage</span>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-4">Blind Thermal Heating &amp; Mechanical Crushing</h3>
+                <ul class="space-y-3 text-sm text-slate-300">
+                    <li class="flex items-start gap-3">
+                        <span class="text-rose-400 font-bold mt-0.5">&#10005;</span>
+                        <span><strong>Destroys Intact Glass:</strong> Undamaged low-iron front glass sheets are shattered into mixed cullet worth <span class="font-mono text-rose-300">₹115/module</span> instead of <span class="font-mono text-emerald-300">₹520/module</span> intact architectural glass.</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span class="text-rose-400 font-bold mt-0.5">&#10005;</span>
+                        <span><strong>Unprofitable Unit Economics:</strong> At <span class="font-mono text-rose-300">₹883–₹1,079/module</span> processing cost vs. <span class="font-mono text-slate-200">₹610–₹890</span> material yield, static plants lose <span class="font-mono text-rose-400">₹189–₹273</span> on every panel.</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span class="text-rose-400 font-bold mt-0.5">&#10005;</span>
+                        <span><strong>Massive Energy Penalty:</strong> Heating every single module to 500&deg;C wastes ~14.5 kWh (<span class="font-mono text-rose-300">₹145/module</span> at ₹10/kWh) even when zero physical damage exists.</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- RayTrace Dynamic Card -->
+            <div class="glass-card rounded-2xl p-6 sm:p-8 border-emerald-500/30 shadow-lg shadow-emerald-500/5">
+                <div class="flex items-center justify-between mb-4">
+                    <span class="px-3 py-1 rounded-full bg-emerald-500/15 text-emerald-300 text-xs font-mono font-semibold border border-emerald-500/30">RAYTRACE AI DYNAMIC PIPELINE</span>
+                    <span class="text-emerald-400 font-mono text-sm font-bold">3-Tier Adaptive</span>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-4">Condition-Aware Laser Trajectory &amp; Yield Routing</h3>
+                <ul class="space-y-3 text-sm text-slate-300">
+                    <li class="flex items-start gap-3">
+                        <span class="text-emerald-400 font-bold mt-0.5">&#10003;</span>
+                        <span><strong>Preserves Clean Modules Whole:</strong> Full DP laser trajectory separates glass, silicon wafers, and metals intact for direct remanufacturing.</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span class="text-emerald-400 font-bold mt-0.5">&#10003;</span>
+                        <span><strong>Surgical Isolation for Electric Faults:</strong> Perimeter-only laser cut frees the intact front glass while leaving shorted semiconductors untouched.</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span class="text-emerald-400 font-bold mt-0.5">&#10003;</span>
+                        <span><strong>Zero Wasted Laser Cycles on Cracked Glass:</strong> Physically shattered modules immediately skip laser gantry time and go straight to cullet crushing.</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. INTERACTIVE STATIC VS. DYNAMIC SIMULATOR + LIVE SVG LASER CANVAS -->
+    <section id="simulator" class="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-slate-800/70">
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">
+            <div>
+                <span class="text-xs font-mono uppercase tracking-widest text-sky-400 font-semibold">Interactive Benchmark Lab (INR)</span>
+                <h2 class="text-3xl sm:text-4xl font-bold text-white mt-2">Static vs. Dynamic Recycling Simulator</h2>
+                <p class="text-slate-400 mt-2 max-w-2xl text-sm sm:text-base">
+                    Toggle incoming module states and adjust batch scale (60/72-cell ~20 kg PV modules) to compare cash flow and recovery yields in ₹.
+                </p>
+            </div>
+            <!-- Hierarchical Precedence Rule Pill -->
+            <div class="px-4 py-2.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-xs text-rose-200 max-w-md">
+                <span class="font-mono font-bold text-rose-400 uppercase block mb-0.5">Defect Precedence Rule (Hybrid Faults)</span>
+                If two types of defects (both <strong>electrical &amp; physical</strong>) are present on a solar panel, the process proceeds with the <strong>physical defect pathway (Path C)</strong> because the front glass cannot be retrieved intact.
+            </div>
+        </div>
+
+        <!-- Controls Bar -->
+        <div class="glass-card rounded-2xl p-5 sm:p-6 mb-8">
+            <div class="grid lg:grid-cols-12 gap-6 items-center">
+                <!-- Condition Selector Buttons (3 Deterministic Triage Paths Only) -->
+                <div class="lg:col-span-8">
+                    <label class="block text-xs font-mono uppercase tracking-wider text-slate-400 mb-3">1. Select Incoming Module Stream (ResNet50 Triage Class)</label>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3" id="conditionButtons">
+                        <button type="button" onclick="setCondition('clean')" id="btn-clean"
+                            class="cond-btn p-3.5 rounded-xl border text-left transition-all bg-emerald-500/15 border-emerald-400 text-white shadow-lg shadow-emerald-500/10">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-mono font-bold text-emerald-300">PATH A</span>
+                                <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+                            </div>
+                            <div class="font-bold text-sm mt-1">Clean Module</div>
+                            <div class="text-[11px] text-slate-300 mt-0.5">Full Retention &bull; +₹1,170/panel</div>
+                        </button>
+
+                        <button type="button" onclick="setCondition('electric')" id="btn-electric"
+                            class="cond-btn p-3.5 rounded-xl border border-slate-700/80 bg-slate-900/60 text-left transition-all hover:border-amber-400/50">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-mono font-bold text-amber-400">PATH B</span>
+                                <span class="w-2.5 h-2.5 rounded-full bg-amber-400/50"></span>
+                            </div>
+                            <div class="font-bold text-sm text-slate-200 mt-1">Electric Faulty</div>
+                            <div class="text-[11px] text-slate-400 mt-0.5">Glass-Only Cut &bull; +₹760/panel</div>
+                        </button>
+
+                        <button type="button" onclick="setCondition('physical')" id="btn-physical"
+                            class="cond-btn p-3.5 rounded-xl border border-slate-700/80 bg-slate-900/60 text-left transition-all hover:border-rose-400/50">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-mono font-bold text-rose-400">PATH C</span>
+                                <span class="w-2.5 h-2.5 rounded-full bg-rose-400/50"></span>
+                            </div>
+                            <div class="font-bold text-sm text-slate-200 mt-1">Physical / Hybrid Defect</div>
+                            <div class="text-[11px] text-slate-400 mt-0.5">Elec + Phys &rarr; Thermal &amp; Crush</div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Batch Volume Slider -->
+                <div class="lg:col-span-4 bg-slate-950/60 p-4 rounded-xl border border-slate-800">
+                    <div class="flex justify-between items-center mb-2">
+                        <label for="batchSlider" class="text-xs font-mono uppercase tracking-wider text-slate-400">2. Batch Volume</label>
+                        <span id="batchCountLabel" class="font-mono text-lg font-bold text-sky-400">1,000 Panels</span>
+                    </div>
+                    <input type="range" id="batchSlider" min="100" max="10000" step="100" value="1000" class="w-full my-2" oninput="updateSimulation()">
+                    <div class="flex justify-between text-[11px] font-mono text-slate-500">
+                        <span>100 (2t)</span>
+                        <span>5,000 (100t)</span>
+                        <span>10,000 (200t)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Simulator Workspace: Live SVG Laser Visualizer (Left) + Economic/Material Metrics (Right) -->
+        <div class="grid lg:grid-cols-12 gap-8 items-stretch">
+            <!-- Left 5 Cols: Interactive SVG Solar Panel & Laser Trajectory Diagram -->
+            <div class="lg:col-span-5 glass-card rounded-2xl p-6 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h3 class="font-bold text-base text-white">Live Laser Trajectory Visualizer</h3>
+                            <p id="svgSubtitle" class="text-xs text-slate-400">Auto-cropped module &bull; Full retention matrix</p>
+                        </div>
+                        <span id="laserStatusPill" class="px-2.5 py-1 rounded-md text-[11px] font-mono font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">45.0 W FULL MATRIX</span>
+                    </div>
+
+                    <!-- Responsive SVG Solar Panel -->
+                    <div class="bg-slate-950 rounded-xl p-4 border border-slate-800/90 flex items-center justify-center">
+                        <svg id="panelSvg" viewBox="0 0 360 240" class="w-full h-auto max-h-[270px] rounded-lg">
+                            <defs>
+                                <pattern id="pvCells" width="52" height="44" patternUnits="userSpaceOnUse" x="24" y="20">
+                                    <rect x="2" y="2" width="48" height="40" rx="3" fill="#0f2544" stroke="#1e3a5f" stroke-width="1.2"/>
+                                    <line x1="18" y1="2" x2="18" y2="42" stroke="#38bdf8" stroke-opacity="0.22" stroke-width="0.8"/>
+                                    <line x1="34" y1="2" x2="34" y2="42" stroke="#38bdf8" stroke-opacity="0.22" stroke-width="0.8"/>
+                                </pattern>
+                                <filter id="glowGreen" x="-20%" y="-20%" width="140%" height="140%">
+                                    <feGaussianBlur stdDeviation="2.5" result="blur" />
+                                    <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                                </filter>
+                                <filter id="glowAmber" x="-20%" y="-20%" width="140%" height="140%">
+                                    <feGaussianBlur stdDeviation="2.5" result="blur" />
+                                    <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                                </filter>
+                            </defs>
+
+                            <!-- Aluminum Frame -->
+                            <rect x="12" y="10" width="336" height="220" rx="8" fill="#091326" stroke="#475569" stroke-width="3"/>
+                            <!-- PV Cell Grid -->
+                            <rect x="24" y="20" width="312" height="200" rx="4" fill="url(#pvCells)"/>
+
+                            <!-- LAYER 1: CLEAN (Full Retention Matrix Laser Cut) -->
+                            <g id="svg-layer-clean">
+                                <rect x="20" y="16" width="320" height="208" rx="4" fill="none" stroke="#10b981" stroke-width="3" class="laser-stroke" filter="url(#glowGreen)"/>
+                                <line x1="76" y1="20" x2="76" y2="220" stroke="#34d399" stroke-width="1.6" class="laser-stroke"/>
+                                <line x1="128" y1="20" x2="128" y2="220" stroke="#34d399" stroke-width="1.6" class="laser-stroke"/>
+                                <line x1="180" y1="20" x2="180" y2="220" stroke="#34d399" stroke-width="1.6" class="laser-stroke"/>
+                                <line x1="232" y1="20" x2="232" y2="220" stroke="#34d399" stroke-width="1.6" class="laser-stroke"/>
+                                <line x1="284" y1="20" x2="284" y2="220" stroke="#34d399" stroke-width="1.6" class="laser-stroke"/>
+                                <line x1="24" y1="64" x2="336" y2="64" stroke="#34d399" stroke-width="1.6" class="laser-stroke"/>
+                                <line x1="24" y1="108" x2="336" y2="108" stroke="#34d399" stroke-width="1.6" class="laser-stroke"/>
+                                <line x1="24" y1="152" x2="336" y2="152" stroke="#34d399" stroke-width="1.6" class="laser-stroke"/>
+                                <line x1="24" y1="196" x2="336" y2="196" stroke="#34d399" stroke-width="1.6" class="laser-stroke"/>
+                            </g>
+
+                            <!-- LAYER 2: ELECTRIC FAULTY (Perimeter Glass Only + Excluded Damaged Cells) -->
+                            <g id="svg-layer-electric" class="hidden">
+                                <rect x="19" y="15" width="322" height="210" rx="4" fill="none" stroke="#facc15" stroke-width="3.5" class="laser-stroke" filter="url(#glowAmber)"/>
+                                <rect x="130" y="66" width="48" height="40" rx="3" fill="#ef4444" fill-opacity="0.45" stroke="#f87171" stroke-width="2"/>
+                                <rect x="182" y="66" width="48" height="40" rx="3" fill="#ef4444" fill-opacity="0.45" stroke="#f87171" stroke-width="2"/>
+                                <rect x="182" y="110" width="48" height="40" rx="3" fill="#f59e0b" fill-opacity="0.35" stroke="#fbbf24" stroke-width="1.5"/>
+                                <rect x="122" y="58" width="116" height="100" rx="6" fill="none" stroke="#f87171" stroke-dasharray="5 4" stroke-width="1.8"/>
+                            </g>
+
+                            <!-- LAYER 3: PHYSICAL DAMAGE / HYBRID DEFECT (Shattered Cracks + Hotspot + Laser Bypassed) -->
+                            <g id="svg-layer-physical" class="hidden">
+                                <!-- Co-occurring electrical hotspot cell -->
+                                <rect x="234" y="66" width="48" height="40" rx="3" fill="#f59e0b" fill-opacity="0.35" stroke="#fbbf24" stroke-dasharray="3 2" stroke-width="1.4"/>
+                                <text x="258" y="89" text-anchor="middle" fill="#fde047" font-family="JetBrains Mono, monospace" font-size="6.5" font-weight="bold">ELEC</text>
+                                <g stroke="#fda4af" stroke-width="1.5" stroke-opacity="0.85" fill="none">
+                                    <polyline points="110,95 75,55 42,35"/>
+                                    <polyline points="110,95 145,45 190,24"/>
+                                    <polyline points="110,95 168,118 245,140 315,185"/>
+                                    <polyline points="110,95 85,155 55,212"/>
+                                    <polyline points="110,95 130,175 165,216"/>
+                                    <polygon points="88,75 132,72 142,115 95,125" stroke-width="1.1"/>
+                                    <polygon points="65,48 158,42 175,135 72,150" stroke-width="0.9"/>
+                                </g>
+                                <circle cx="110" cy="95" r="6" fill="#f43f5e"/>
+                                <rect x="28" y="182" width="304" height="28" rx="5" fill="#881337" fill-opacity="0.94" stroke="#fb7185" stroke-width="1"/>
+                                <text x="180" y="199" text-anchor="middle" fill="#ffffff" font-family="JetBrains Mono, monospace" font-size="9" font-weight="bold">PHYS OVERRIDE &rarr; THERMAL &amp; CRUSH</text>
+                            </g>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Dynamic Action Summary Box -->
+                <div id="actionSummaryBox" class="mt-4 p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/25">
+                    <div class="text-xs font-mono font-bold text-emerald-300 uppercase" id="actionTitle">Path A: 100% Material Retention (Glass + Silicon + Metals)</div>
+                    <p class="text-xs text-slate-300 mt-1 leading-relaxed" id="actionDesc">
+                        Full perimeter and internal cell-matrix laser cut separates intact front tempered glass (₹520), undamaged silicon wafers (₹480), Ag/Cu busbars (₹340), and Al frame (₹210).
+                    </p>
+                </div>
+            </div>
+
+            <!-- Right 7 Cols: Side-by-Side Static vs. Dynamic Quantitative Comparison (INR) -->
+            <div class="lg:col-span-7 glass-card rounded-2xl p-6 flex flex-col justify-between">
+                <div>
+                    <div class="flex flex-wrap items-center justify-between gap-2 pb-4 mb-6 border-b border-slate-800">
+                        <div>
+                            <h3 class="font-bold text-lg text-white">Batch Financial &amp; Material Cash Flow (INR)</h3>
+                            <p class="text-xs text-slate-400">CEEW/CPCB Static Baseline (₹883/panel) vs. RayTrace AI Dynamic Triage</p>
+                        </div>
+                        <div class="px-3.5 py-1.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-right">
+                            <span class="text-[11px] font-mono text-emerald-300 block">BATCH NET PROFIT GAIN</span>
+                            <span id="netGainBadge" class="font-mono font-extrabold text-base sm:text-lg text-emerald-400">+₹14,43,000</span>
+                        </div>
+                    </div>
+
+                    <!-- Metric Bars -->
+                    <div class="space-y-5">
+                        <!-- 1. Gross Recovered Value vs Processing Cost (INR) -->
+                        <div>
+                            <div class="flex justify-between text-sm mb-2">
+                                <span class="font-semibold text-slate-200">Gross Recovered Value vs. Processing Cost (₹)</span>
+                                <span id="unitMarginPill" class="font-mono text-xs text-emerald-400 font-semibold">Net Margin: +₹1,170/panel vs -₹273/panel</span>
+                            </div>
+                            <div class="space-y-2.5">
+                                <div>
+                                    <div class="flex justify-between text-xs font-mono mb-1">
+                                        <span class="text-sky-400 font-semibold">RayTrace AI Gross Value (Cost: <span id="dynCostText" class="text-slate-300">₹3,80,000</span>)</span>
+                                        <span id="dynValueText" class="text-white font-bold">₹15,50,000</span>
+                                    </div>
+                                    <div class="h-3 rounded-full bg-slate-900 overflow-hidden">
+                                        <div id="dynValueBar" class="h-full rounded-full bg-gradient-to-r from-sky-500 to-emerald-400 transition-all duration-500" style="width: 97%"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between text-xs font-mono mb-1">
+                                        <span class="text-slate-400">Static Mechanical Gross Value (Cost: <span id="statCostText" class="text-rose-300">₹8,83,000</span>)</span>
+                                        <span id="statValueText" class="text-slate-300">₹6,10,000</span>
+                                    </div>
+                                    <div class="h-3 rounded-full bg-slate-900 overflow-hidden">
+                                        <div id="statValueBar" class="h-full rounded-full bg-slate-600 transition-all duration-500" style="width: 38%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 2. Net Batch Profit/Loss Comparison Cards -->
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="p-3.5 rounded-xl bg-emerald-950/30 border border-emerald-500/30">
+                                <div class="text-[11px] font-mono text-emerald-300">RAYTRACE AI NET PROFIT</div>
+                                <div id="dynNetProfitText" class="text-xl sm:text-2xl font-extrabold font-mono text-emerald-400 mt-1">+₹11,70,000</div>
+                                <div id="dynUnitProfitNote" class="text-[11px] font-mono text-slate-300 mt-0.5">+₹1,170 net / module</div>
+                            </div>
+                            <div class="p-3.5 rounded-xl bg-rose-950/30 border border-rose-500/30">
+                                <div class="text-[11px] font-mono text-rose-300">STATIC PLANT NET LOSS</div>
+                                <div id="statNetProfitText" class="text-xl sm:text-2xl font-extrabold font-mono text-rose-400 mt-1">-₹2,73,000</div>
+                                <div id="statUnitProfitNote" class="text-[11px] font-mono text-slate-400 mt-0.5">-₹273 net / module</div>
+                            </div>
+                        </div>
+
+                        <!-- 3. Intact Glass Sheet Retention + Energy Saved -->
+                        <div class="grid sm:grid-cols-2 gap-4 pt-1">
+                            <div class="p-4 rounded-xl bg-slate-900/70 border border-slate-800">
+                                <div class="text-xs font-mono text-slate-400">INTACT GLASS SHEET YIELD</div>
+                                <div class="flex items-baseline justify-between mt-1.5">
+                                    <span id="dynGlassPct" class="text-2xl font-extrabold font-mono text-emerald-400">96.8%</span>
+                                    <span class="text-xs font-mono text-slate-500">vs. 0% Static</span>
+                                </div>
+                                <p id="dynGlassNote" class="text-xs text-slate-400 mt-1">Whole architectural glass sheet (₹520)</p>
+                            </div>
+
+                            <div class="p-4 rounded-xl bg-slate-900/70 border border-slate-800">
+                                <div class="text-xs font-mono text-slate-400">THERMAL ENERGY SAVED (₹10/kWh)</div>
+                                <div class="flex items-baseline justify-between mt-1.5">
+                                    <span id="energySavedText" class="text-2xl font-extrabold font-mono text-amber-400">13,400 kWh</span>
+                                    <span id="energyRupeeText" class="text-xs font-mono text-emerald-400">₹1,34,000 saved</span>
+                                </div>
+                                <p id="energyNote" class="text-xs text-slate-400 mt-1">Avoids 500&deg;C pyrolysis furnace</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 pt-4 border-t border-slate-800 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400 font-mono">
+                    <span>Random Forest Yield Score: <strong id="rfScoreText" class="text-emerald-400">95.4%</strong></span>
+                    <span>Laser Power Draw: <strong id="simLaserW" class="text-sky-400">45.0 W</strong></span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. UNIT ECONOMICS & COST BREAKDOWN (INR PER MODULE) -->
+    <section id="unit-economics" class="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-slate-800/70">
+        <div class="max-w-3xl mb-12">
+            <span class="text-xs font-mono uppercase tracking-widest text-amber-400 font-semibold">Indian PV Recycling Benchmarks (CEEW / CPCB)</span>
+            <h2 class="text-3xl sm:text-4xl font-bold text-white mt-2">Unit Economics &amp; Cost Breakdown (₹ per Module)</h2>
+            <p class="text-slate-400 mt-3 text-sm sm:text-base">
+                Standard 60/72-cell (~20 kg) crystalline silicon PV module economics in India. Conventional mechanical plants spend <span class="font-mono text-slate-200">₹883/module</span> (and chemical/thermal plants <span class="font-mono text-slate-200">₹1,079/module</span>) while destroying high-value glass and silicon wafers.
+            </p>
+        </div>
+
+        <!-- Two Detailed Breakdown Cards: Processing Costs vs. Recovered Commodity Value -->
+        <div class="grid lg:grid-cols-2 gap-8 mb-10">
+            <!-- Card A: Per-Module Processing Cost Breakdown (₹) -->
+            <div class="glass-card rounded-2xl p-6 sm:p-8 border-slate-800">
+                <div class="flex items-center justify-between pb-4 mb-6 border-b border-slate-800">
+                    <div>
+                        <span class="text-xs font-mono text-rose-400 uppercase font-semibold">Operating Expenditure (OPEX)</span>
+                        <h3 class="text-xl font-bold text-white mt-0.5">Processing Cost Breakdown (₹ / Module)</h3>
+                    </div>
+                    <span class="px-3 py-1 rounded-lg bg-slate-900 border border-slate-700 font-mono text-xs text-slate-300">20 kg Module</span>
+                </div>
+
+                <div class="space-y-4 text-sm">
+                    <div class="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800/90 flex items-center justify-between gap-4">
+                        <div>
+                            <div class="font-semibold text-white">1. Module Intake &amp; Reverse Logistics</div>
+                            <div class="text-xs text-slate-400">Collection, frame unbolting &amp; junction box stripping</div>
+                        </div>
+                        <div class="text-right font-mono shrink-0">
+                            <div class="text-emerald-400 font-bold">₹140 <span class="text-[11px] text-slate-500">RayTrace</span></div>
+                            <div class="text-xs text-slate-400">₹165 Static</div>
+                        </div>
+                    </div>
+
+                    <div class="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800/90 flex items-center justify-between gap-4">
+                        <div>
+                            <div class="font-semibold text-white">2. Industrial Electricity (@ ₹10 / kWh)</div>
+                            <div class="text-xs text-slate-400">45W laser + vision (1.1 kWh) vs. 500&deg;C furnace (14.5 kWh)</div>
+                        </div>
+                        <div class="text-right font-mono shrink-0">
+                            <div class="text-emerald-400 font-bold">₹11 <span class="text-[11px] text-slate-500">Path A/B</span></div>
+                            <div class="text-xs text-rose-400">₹145–₹220 Static</div>
+                        </div>
+                    </div>
+
+                    <div class="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800/90 flex items-center justify-between gap-4">
+                        <div>
+                            <div class="font-semibold text-white">3. Laser Optics &amp; CNC Gantry Wear</div>
+                            <div class="text-xs text-slate-400">Amortized fiber laser diode, lens &amp; motion stage (₹0 on Path C)</div>
+                        </div>
+                        <div class="text-right font-mono shrink-0">
+                            <div class="text-sky-400 font-bold">₹65–₹115 <span class="text-[11px] text-slate-500">RayTrace</span></div>
+                            <div class="text-xs text-slate-500">₹0 Static</div>
+                        </div>
+                    </div>
+
+                    <div class="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800/90 flex items-center justify-between gap-4">
+                        <div>
+                            <div class="font-semibold text-white">4. Thermal / Chemical &amp; Crushing Consumables</div>
+                            <div class="text-xs text-slate-400">Acid leaching / shredder blades (bypassed on Clean &amp; Electric)</div>
+                        </div>
+                        <div class="text-right font-mono shrink-0">
+                            <div class="text-emerald-400 font-bold">₹34 <span class="text-[11px] text-slate-500">Path A/B</span></div>
+                            <div class="text-xs text-rose-400">₹368–₹489 Static</div>
+                        </div>
+                    </div>
+
+                    <div class="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800/90 flex items-center justify-between gap-4">
+                        <div>
+                            <div class="font-semibold text-white">5. Automated Triage &amp; Sorting Labor</div>
+                            <div class="text-xs text-slate-400">ResNet50 automated optical sorting vs. manual batch handling</div>
+                        </div>
+                        <div class="text-right font-mono shrink-0">
+                            <div class="text-emerald-400 font-bold">₹70–₹110 <span class="text-[11px] text-slate-500">RayTrace</span></div>
+                            <div class="text-xs text-slate-400">₹205 Static</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card B: Per-Module Recovered Commodity Value Breakdown (₹) -->
+            <div class="glass-card rounded-2xl p-6 sm:p-8 border-emerald-500/25">
+                <div class="flex items-center justify-between pb-4 mb-6 border-b border-slate-800">
+                    <div>
+                        <span class="text-xs font-mono text-emerald-400 uppercase font-semibold">Material Revenue Streams</span>
+                        <h3 class="text-xl font-bold text-white mt-0.5">Recovered Commodity Value (₹ / Module)</h3>
+                    </div>
+                    <span class="px-3 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/30 font-mono text-xs text-emerald-300">Up to ₹1,550</span>
+                </div>
+
+                <div class="space-y-4 text-sm">
+                    <div class="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800/90 flex items-center justify-between gap-4">
+                        <div>
+                            <div class="font-semibold text-white">1. Tempered Low-Iron Front Glass (~14 kg)</div>
+                            <div class="text-xs text-slate-400">Intact sheet (Path A &amp; B) vs. crushed cullet (Static / Path C)</div>
+                        </div>
+                        <div class="text-right font-mono shrink-0">
+                            <div class="text-emerald-400 font-bold">₹520 <span class="text-[11px] text-slate-500">Intact Sheet</span></div>
+                            <div class="text-xs text-rose-400">₹115 Crushed Cullet</div>
+                        </div>
+                    </div>
+
+                    <div class="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800/90 flex items-center justify-between gap-4">
+                        <div>
+                            <div class="font-semibold text-white">2. Crystalline Silicon Wafers (~0.7 kg)</div>
+                            <div class="text-xs text-slate-400">Reusable whole wafers (Path A) vs. metallurgical silicon powder</div>
+                        </div>
+                        <div class="text-right font-mono shrink-0">
+                            <div class="text-emerald-400 font-bold">₹480 <span class="text-[11px] text-slate-500">Path A Wafers</span></div>
+                            <div class="text-xs text-slate-400">₹95–₹160 Powder</div>
+                        </div>
+                    </div>
+
+                    <div class="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800/90 flex items-center justify-between gap-4">
+                        <div>
+                            <div class="font-semibold text-white">3. Silver (Ag) Paste &amp; Copper Busbars</div>
+                            <div class="text-xs text-slate-400">~18g silver &amp; ~180g copper ribbons recovered cleanly</div>
+                        </div>
+                        <div class="text-right font-mono shrink-0">
+                            <div class="text-sky-400 font-bold">₹340 <span class="text-[11px] text-slate-500">High Purity</span></div>
+                            <div class="text-xs text-slate-400">₹190–₹310 Static</div>
+                        </div>
+                    </div>
+
+                    <div class="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800/90 flex items-center justify-between gap-4">
+                        <div>
+                            <div class="font-semibold text-white">4. Anodized Aluminum Frame (~3.2 kg)</div>
+                            <div class="text-xs text-slate-400">6063-T5 aluminum alloy extrusion scrap / reuse</div>
+                        </div>
+                        <div class="text-right font-mono shrink-0">
+                            <div class="text-slate-200 font-bold">₹210 <span class="text-[11px] text-slate-500">All Paths</span></div>
+                            <div class="text-xs text-slate-400">₹210 Static</div>
+                        </div>
+                    </div>
+
+                    <div class="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-between gap-4">
+                        <div class="font-bold text-emerald-300">Total Gross Commodity Yield (Path A Clean)</div>
+                        <div class="font-mono font-extrabold text-lg text-emerald-400">₹1,550 / module</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Per-Pathway Financial Ledger Table -->
+        <div class="glass-card rounded-2xl overflow-hidden border border-slate-800">
+            <div class="px-6 py-4 bg-slate-950/70 border-b border-slate-800 flex flex-wrap items-center justify-between gap-2">
+                <h3 class="font-bold text-base text-white">Per-Pathway Unit Financial Ledger (₹ / Module)</h3>
+                <span class="text-xs font-mono text-slate-400">Source: CEEW/CPCB Indian PV Recycling Baselines &amp; RayTrace AI Telemetry</span>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="border-b border-slate-800 bg-slate-950/40 text-xs font-mono uppercase tracking-wider text-slate-400">
+                            <th class="py-3.5 px-6">Recycling Pipeline / Triage Path</th>
+                            <th class="py-3.5 px-6">Processing Cost (₹)</th>
+                            <th class="py-3.5 px-6">Gross Material Yield (₹)</th>
+                            <th class="py-3.5 px-6">Net Profit / Loss (₹)</th>
+                            <th class="py-3.5 px-6">Primary Value Driver</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-800/70 text-sm">
+                        <tr class="hover:bg-slate-900/40">
+                            <td class="py-4 px-6 font-semibold text-slate-300">Conventional Mechanical Line</td>
+                            <td class="py-4 px-6 font-mono text-rose-300">₹883</td>
+                            <td class="py-4 px-6 font-mono text-slate-300">₹610</td>
+                            <td class="py-4 px-6 font-mono font-bold text-rose-400">-₹273 / module</td>
+                            <td class="py-4 px-6 text-xs text-slate-400">Glass &amp; wafers crushed into low-grade cullet</td>
+                        </tr>
+                        <tr class="hover:bg-slate-900/40">
+                            <td class="py-4 px-6 font-semibold text-slate-300">Conventional Chemical / Pyrolysis Line</td>
+                            <td class="py-4 px-6 font-mono text-rose-300">₹1,079</td>
+                            <td class="py-4 px-6 font-mono text-slate-300">₹890</td>
+                            <td class="py-4 px-6 font-mono font-bold text-rose-400">-₹189 / module</td>
+                            <td class="py-4 px-6 text-xs text-slate-400">High 500&deg;C furnace &amp; acid reagent cost</td>
+                        </tr>
+                        <tr class="bg-emerald-500/5 hover:bg-emerald-500/10">
+                            <td class="py-4 px-6 font-bold text-emerald-300">RayTrace AI &bull; Path A (Clean / Good)</td>
+                            <td class="py-4 px-6 font-mono text-emerald-300">₹380</td>
+                            <td class="py-4 px-6 font-mono text-white font-semibold">₹1,550</td>
+                            <td class="py-4 px-6 font-mono font-extrabold text-emerald-400">+₹1,170 / module</td>
+                            <td class="py-4 px-6 text-xs text-emerald-200">Full glass sheet + whole wafers + Ag/Cu retained</td>
+                        </tr>
+                        <tr class="bg-amber-500/5 hover:bg-amber-500/10">
+                            <td class="py-4 px-6 font-bold text-amber-300">RayTrace AI &bull; Path B (Electric Faulty)</td>
+                            <td class="py-4 px-6 font-mono text-amber-300">₹310</td>
+                            <td class="py-4 px-6 font-mono text-white font-semibold">₹1,070</td>
+                            <td class="py-4 px-6 font-mono font-extrabold text-amber-400">+₹760 / module</td>
+                            <td class="py-4 px-6 text-xs text-amber-200">Intact glass sheet (₹520) saved; bad cells isolated</td>
+                        </tr>
+                        <tr class="bg-rose-500/5 hover:bg-rose-500/10">
+                            <td class="py-4 px-6 font-bold text-rose-300">
+                                RayTrace AI &bull; Path C (Physical / Hybrid Defect)
+                                <span class="block text-[11px] font-normal text-rose-200/80 mt-0.5">Includes co-occurring Electrical + Physical defects</span>
+                            </td>
+                            <td class="py-4 px-6 font-mono text-slate-300">₹780</td>
+                            <td class="py-4 px-6 font-mono text-slate-300">₹540</td>
+                            <td class="py-4 px-6 font-mono font-bold text-rose-300">-₹240 / module</td>
+                            <td class="py-4 px-6 text-xs text-slate-300">Physical damage takes precedence (glass cannot be retrieved); saves ₹103/panel in OPEX by bypassing laser</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. DUAL-MODEL ARCHITECTURE SECTION -->
+    <section id="architecture" class="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-slate-800/70">
+        <div class="text-center max-w-3xl mx-auto mb-14">
+            <span class="text-xs font-mono uppercase tracking-widest text-sky-400 font-semibold">System Engineering</span>
+            <h2 class="text-3xl sm:text-4xl font-bold text-white mt-2">Dual-Model Machine Learning Architecture</h2>
+            <p class="text-slate-400 mt-3 text-sm sm:text-base">
+                RayTrace AI decouples visual defect classification (<span class="text-sky-300 font-mono">96.89%</span> ResNet50 accuracy) from physical recovery yield estimation—ensuring every CNC laser command is backed by quantitative INR unit economics.
+            </p>
+        </div>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Stage 0 -->
+            <div class="glass-card glass-card-hover rounded-2xl p-6">
+                <div class="w-11 h-11 rounded-xl bg-sky-500/15 border border-sky-500/30 text-sky-400 flex items-center justify-center font-mono font-bold mb-5">00</div>
+                <div class="text-xs font-mono text-sky-400 mb-1">PREPROCESSING</div>
+                <h3 class="text-lg font-bold text-white mb-2">OpenCV 4-Point Perspective Crop</h3>
+                <p class="text-sm text-slate-300 leading-relaxed">
+                    Isolates the solar module from background clutter via Canny edge contours and 4-point perspective warping—aligning panel axes with CNC coordinates.
+                </p>
+                <div class="mt-4 pt-4 border-t border-slate-800/80 flex flex-wrap gap-2 text-[11px] font-mono text-slate-400">
+                    <span class="px-2 py-1 rounded bg-slate-900">warpPerspective</span>
+                </div>
+            </div>
+
+            <!-- Model 1 -->
+            <div class="glass-card glass-card-hover rounded-2xl p-6">
+                <div class="w-11 h-11 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 flex items-center justify-center font-mono font-bold mb-5">01</div>
+                <div class="text-xs font-mono text-emerald-400 mb-1">MODEL 1 &bull; 96.89% ACC</div>
+                <h3 class="text-lg font-bold text-white mb-2">ResNet50 Defect Triage Classifier</h3>
+                <p class="text-sm text-slate-300 leading-relaxed">
+                    Classifies cropped modules into <em>Good Condition</em>, <em>Electric Faulty</em>, or <em>Physical Damage</em>. When both electrical and physical defects coexist, physical damage overrides to Path C since glass cannot be retrieved.
+                </p>
+                <div class="mt-4 pt-4 border-t border-slate-800/80 flex flex-wrap gap-2 text-[11px] font-mono text-slate-400">
+                    <span class="px-2 py-1 rounded bg-slate-900">PyTorch ResNet50</span>
+                    <span class="px-2 py-1 rounded bg-rose-500/10 text-rose-300">Hybrid &rarr; Path C</span>
+                </div>
+            </div>
+
+            <!-- Stage 2 -->
+            <div class="glass-card glass-card-hover rounded-2xl p-6">
+                <div class="w-11 h-11 rounded-xl bg-cyan-500/15 border border-cyan-500/30 text-cyan-400 flex items-center justify-center font-mono font-bold mb-5">02</div>
+                <div class="text-xs font-mono text-cyan-400 mb-1">TRAJECTORY ENGINE</div>
+                <h3 class="text-lg font-bold text-white mb-2">DP CNC Laser Path Optimizer</h3>
+                <p class="text-sm text-slate-300 leading-relaxed">
+                    Generates full-matrix waypoints for clean panels, perimeter glass-only cuts for electric faults, or 0 W bypass for shattered glass.
+                </p>
+                <div class="mt-4 pt-4 border-t border-slate-800/80 flex flex-wrap gap-2 text-[11px] font-mono text-slate-400">
+                    <span class="px-2 py-1 rounded bg-slate-900">Dynamic Programming</span>
+                </div>
+            </div>
+
+            <!-- Model 2 -->
+            <div class="glass-card glass-card-hover rounded-2xl p-6">
+                <div class="w-11 h-11 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-400 flex items-center justify-center font-mono font-bold mb-5">03</div>
+                <div class="text-xs font-mono text-amber-400 mb-1">MODEL 2 &bull; YIELD REGRESSOR</div>
+                <h3 class="text-lg font-bold text-white mb-2">Random Forest Yield &amp; ₹ Forecaster</h3>
+                <p class="text-sm text-slate-300 leading-relaxed">
+                    Combines defect area ratio, cut segment count, cut length (mm), and laser power to predict net material recovery yield (%) and ₹ margin.
+                </p>
+                <div class="mt-4 pt-4 border-t border-slate-800/80 flex flex-wrap gap-2 text-[11px] font-mono text-slate-400">
+                    <span class="px-2 py-1 rounded bg-slate-900">RandomForestRegressor</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 6. COMPREHENSIVE COMPARISON MATRIX TABLE -->
+    <section id="benchmarks" class="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-slate-800/70">
+        <div class="mb-10">
+            <span class="text-xs font-mono uppercase tracking-widest text-emerald-400 font-semibold">Architectural Evaluation</span>
+            <h2 class="text-3xl sm:text-4xl font-bold text-white mt-2">Model Comparison Matrix</h2>
+            <p class="text-slate-400 mt-2 text-sm sm:text-base">
+                How RayTrace AI compares against traditional static recycling lines and naive single-stage vision sorters under Indian CPCB E-Waste norms.
+            </p>
+        </div>
+
+        <div class="glass-card rounded-2xl overflow-hidden border border-slate-800">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="border-b border-slate-800 bg-slate-950/70 text-xs font-mono uppercase tracking-wider text-slate-400">
+                            <th class="py-4 px-6">Evaluation Metric</th>
+                            <th class="py-4 px-6">Static Mechanical Line<br><span class="text-[10px] text-rose-400 font-normal">(₹883 / panel baseline)</span></th>
+                            <th class="py-4 px-6">Static Chemical / Thermal<br><span class="text-[10px] text-amber-400 font-normal">(₹1,079 / panel baseline)</span></th>
+                            <th class="py-4 px-6 bg-sky-500/10 text-sky-300 border-l border-sky-500/20">RayTrace AI<br><span class="text-[10px] text-emerald-400 font-normal">(3-Tier Dynamic Triage)</span></th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-800/70 text-sm">
+                        <tr class="hover:bg-slate-900/40">
+                            <td class="py-4 px-6 font-semibold text-white">Glass Integrity &amp; Value</td>
+                            <td class="py-4 px-6 text-rose-300">0% intact (₹115 cullet)</td>
+                            <td class="py-4 px-6 text-amber-300">Delaminated, thermally stressed</td>
+                            <td class="py-4 px-6 bg-sky-500/5 border-l border-sky-500/20 text-emerald-300 font-semibold">Up to 96.8% intact sheet (₹520/panel)</td>
+                        </tr>
+                        <tr class="hover:bg-slate-900/40">
+                            <td class="py-4 px-6 font-semibold text-white">Semiconductor Recovery</td>
+                            <td class="py-4 px-6 text-slate-400">Crushed silicon dust (₹95)</td>
+                            <td class="py-4 px-6 text-slate-300">Chemical etched Si (₹160)</td>
+                            <td class="py-4 px-6 bg-sky-500/5 border-l border-sky-500/20 text-emerald-300 font-semibold">Whole wafers saved on Path A (₹480); isolated on Path B</td>
+                        </tr>
+                        <tr class="hover:bg-slate-900/40">
+                            <td class="py-4 px-6 font-semibold text-white">Processing Cost (₹ / Panel)</td>
+                            <td class="py-4 px-6 font-mono text-slate-300">₹883 / module</td>
+                            <td class="py-4 px-6 font-mono text-rose-300">₹1,079 / module</td>
+                            <td class="py-4 px-6 bg-sky-500/5 border-l border-sky-500/20 font-mono text-emerald-400 font-bold">₹310 – ₹380 (Path A/B) &bull; ₹780 (Path C)</td>
+                        </tr>
+                        <tr class="hover:bg-slate-900/40">
+                            <td class="py-4 px-6 font-semibold text-white">Net Unit Margin (₹ / Panel)</td>
+                            <td class="py-4 px-6 font-mono text-rose-400 font-bold">-₹273 / module (Loss)</td>
+                            <td class="py-4 px-6 font-mono text-rose-400 font-bold">-₹189 / module (Loss)</td>
+                            <td class="py-4 px-6 bg-sky-500/5 border-l border-sky-500/20 font-mono text-emerald-400 font-bold">+₹1,170 (Clean) &bull; +₹760 (Electric)</td>
+                        </tr>
+                        <tr class="hover:bg-slate-900/40">
+                            <td class="py-4 px-6 font-semibold text-white">Co-occurring Defect Rule</td>
+                            <td class="py-4 px-6 text-slate-400">No defect differentiation</td>
+                            <td class="py-4 px-6 text-slate-400">No defect differentiation</td>
+                            <td class="py-4 px-6 bg-sky-500/5 border-l border-sky-500/20 text-rose-300 font-semibold">If both electrical &amp; physical defects exist, proceeds with Physical (Path C) as glass cannot be retrieved</td>
+                        </tr>
+                        <tr class="hover:bg-slate-900/40">
+                            <td class="py-4 px-6 font-semibold text-white">Net Unit Margin (₹ / Panel)</td>
+                            <td class="py-4 px-6 font-mono text-rose-400 font-bold">-₹273 / module (Loss)</td>
+                            <td class="py-4 px-6 font-mono text-rose-400 font-bold">-₹189 / module (Loss)</td>
+                            <td class="py-4 px-6 bg-sky-500/5 border-l border-sky-500/20 font-mono text-emerald-400 font-bold">+₹1,140 (Clean) &bull; +₹750 (Electric)</td>
+                        </tr>
+                        <tr class="hover:bg-slate-900/40">
+                            <td class="py-4 px-6 font-semibold text-white">Co-occurring Defect Rule</td>
+                            <td class="py-4 px-6 text-slate-400">No defect differentiation</td>
+                            <td class="py-4 px-6 text-slate-400">No defect differentiation</td>
+                            <td class="py-4 px-6 bg-sky-500/5 border-l border-sky-500/20 text-rose-300 font-semibold">Electrical + Physical defaults to Physical (Path C) as glass cannot be retrieved</td>
+                        </tr>
+                        <tr class="hover:bg-slate-900/40">
+                            <td class="py-4 px-6 font-semibold text-white">CPCB E-Waste Compliance</td>
+                            <td class="py-4 px-6 text-slate-300">Basic material recovery</td>
+                            <td class="py-4 px-6 text-amber-300">Acid effluent treatment required</td>
+                            <td class="py-4 px-6 bg-sky-500/5 border-l border-sky-500/20 text-emerald-300 font-semibold">Dry cold-laser separation &bull; Exceeds CPCB EPR targets</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-800/80 py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <!-- Team Attribution Card -->
+        <div class="glass-card rounded-2xl p-6 sm:p-8 border border-slate-800/90 mb-8">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div>
+                    <span class="text-xs font-mono uppercase tracking-widest text-sky-400 font-semibold">Project Team</span>
+                    <h3 class="text-lg sm:text-xl font-bold text-white mt-1">Done by</h3>
+                </div>
+
+                <div class="grid sm:grid-cols-3 gap-4 flex-1 md:max-w-3xl">
+                    <div class="p-3.5 rounded-xl bg-slate-950/75 border border-slate-800/90 hover:border-sky-500/40 transition-colors">
+                        <div class="font-semibold text-sm text-white">Shree Hashwanth</div>
+                        <div class="font-mono text-xs text-sky-400 mt-1">1DS25CS249</div>
+                    </div>
+
+                    <div class="p-3.5 rounded-xl bg-slate-950/75 border border-slate-800/90 hover:border-sky-500/40 transition-colors">
+                        <div class="font-semibold text-sm text-white">Sanjana M Kurandawad</div>
+                        <div class="font-mono text-xs text-sky-400 mt-1">1DS25CS234</div>
+                    </div>
+
+                    <div class="p-3.5 rounded-xl bg-slate-950/75 border border-slate-800/90 hover:border-sky-500/40 transition-colors">
+                        <div class="font-semibold text-sm text-white">Tanushree S</div>
+                        <div class="font-mono text-xs text-sky-400 mt-1">1DS25CS294</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400 font-mono">
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                <span>RAYTRACE AI &bull; DUAL-MODEL SOLAR RECOVERY &amp; PHOTONICS OPTIMIZER (INR EDITION)</span>
+            </div>
+            <div>FastAPI &bull; PyTorch ResNet50 (96.89%) &bull; RandomForestRegressor &bull; OpenCV</div>
+        </div>
+    </footer>
+
+    <!-- Interactive Simulator Script (INR / Indian Numbering) -->
+    <script>
+        let currentCondition = 'clean';
+
+        // Format numbers in Indian Rupee style (e.g., ₹11,39,500)
+        function formatINR(amount, signed = false) {
+            const absVal = Math.round(Math.abs(amount));
+            const prefix = signed ? (amount >= 0 ? '+₹' : '-₹') : (amount < 0 ? '-₹' : '₹');
+            return prefix + absVal.toLocaleString('en-IN');
+        }
+
+        // Per-panel INR economics grounded in CEEW/CPCB Indian solar recycling baselines
+        const SIMULATION_PROFILES = {
+            clean: {
+                subtitle: "Auto-cropped module • Full retention matrix",
+                pillText: "45.0 W FULL MATRIX",
+                pillClass: "px-2.5 py-1 rounded-md text-[11px] font-mono font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30",
+                actionBoxClass: "mt-4 p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/25",
+                actionTitleClass: "text-xs font-mono font-bold text-emerald-300 uppercase",
+                actionTitle: "Path A: 100% Material Retention (Glass + Silicon + Metals)",
+                actionDesc: "Full perimeter and internal cell-matrix laser cut separates intact front tempered glass (₹520), undamaged silicon wafers (₹480), Ag/Cu busbars (₹340), and Al frame (₹210).",
+                dynGrossPerPanel: 1550.00,
+                dynCostPerPanel: 380.00,
+                statGrossPerPanel: 610.00,
+                statCostPerPanel: 883.00,
+                dynGlassPct: "96.8%",
+                dynGlassNote: "Whole architectural glass sheet (₹520)",
+                energySavedPerPanel: 13.40,
+                energyNote: "Avoids 500°C pyrolysis furnace",
+                rfYield: "95.4%",
+                laserW: "45.0 W"
+            },
+            electric: {
+                subtitle: "Auto-cropped module • Perimeter glass cut only",
+                pillText: "45.0 W PERIMETER ONLY",
+                pillClass: "px-2.5 py-1 rounded-md text-[11px] font-mono font-semibold bg-amber-500/15 text-amber-300 border border-amber-500/30",
+                actionBoxClass: "mt-4 p-4 rounded-xl bg-amber-500/10 border border-amber-500/25",
+                actionTitleClass: "text-xs font-mono font-bold text-amber-300 uppercase",
+                actionTitle: "Path B: Selective Glass Retention (Damaged Semiconductors Excluded)",
+                actionDesc: "Executes outer perimeter laser delamination to release the intact front glass sheet (₹520) while bypassing electrically shorted semiconductor cells.",
+                dynGrossPerPanel: 1070.00,
+                dynCostPerPanel: 310.00,
+                statGrossPerPanel: 610.00,
+                statCostPerPanel: 883.00,
+                dynGlassPct: "94.5%",
+                dynGlassNote: "Intact front glass sheet reclaimed (₹520)",
+                energySavedPerPanel: 11.80,
+                energyNote: "Cold laser delamination saves furnace heat",
+                rfYield: "78.6%",
+                laserW: "45.0 W"
+            },
+            physical: {
+                subtitle: "Physical or Hybrid (Elec + Phys) • Laser bypassed",
+                pillText: "0.0 W LASER BYPASSED",
+                pillClass: "px-2.5 py-1 rounded-md text-[11px] font-mono font-semibold bg-rose-500/15 text-rose-300 border border-rose-500/30",
+                actionBoxClass: "mt-4 p-4 rounded-xl bg-rose-500/10 border border-rose-500/25",
+                actionTitleClass: "text-xs font-mono font-bold text-rose-300 uppercase",
+                actionTitle: "Path C: Physical Damage Protocol (Overrides Co-occurring Electrical Faults)",
+                actionDesc: "If two types of defects (both electrical and physical) are present on a solar panel, the process proceeds with the physical defect pathway itself because the front glass cannot be retrieved intact—routing directly to EVA thermal heating and cullet crushing.",
+                dynGrossPerPanel: 540.00,
+                dynCostPerPanel: 780.00,
+                statGrossPerPanel: 610.00,
+                statCostPerPanel: 883.00,
+                dynGlassPct: "0.0%",
+                dynGlassNote: "Glass unretrievable; routed to cullet crushing",
+                energySavedPerPanel: 1.20,
+                energyNote: "Zero wasted laser gantry power",
+                rfYield: "61.2%",
+                laserW: "0.0 W"
+            }
+        };
+
+        function setCondition(cond) {
+            currentCondition = cond;
+
+            const btnClean = document.getElementById('btn-clean');
+            const btnElectric = document.getElementById('btn-electric');
+            const btnPhysical = document.getElementById('btn-physical');
+
+            const inactiveClass = "cond-btn p-3.5 rounded-xl border border-slate-700/80 bg-slate-900/60 text-left transition-all";
+            btnClean.className = inactiveClass + " hover:border-emerald-400/50";
+            btnElectric.className = inactiveClass + " hover:border-amber-400/50";
+            btnPhysical.className = inactiveClass + " hover:border-rose-400/50";
+
+            if (cond === 'clean') {
+                btnClean.className = "cond-btn p-3.5 rounded-xl border text-left transition-all bg-emerald-500/15 border-emerald-400 text-white shadow-lg shadow-emerald-500/10";
+            } else if (cond === 'electric') {
+                btnElectric.className = "cond-btn p-3.5 rounded-xl border text-left transition-all bg-amber-500/15 border-amber-400 text-white shadow-lg shadow-amber-500/10";
+            } else {
+                btnPhysical.className = "cond-btn p-3.5 rounded-xl border text-left transition-all bg-rose-500/15 border-rose-400 text-white shadow-lg shadow-rose-500/10";
+            }
+
+            // Toggle SVG layers
+            document.getElementById('svg-layer-clean').classList.toggle('hidden', cond !== 'clean');
+            document.getElementById('svg-layer-electric').classList.toggle('hidden', cond !== 'electric');
+            document.getElementById('svg-layer-physical').classList.toggle('hidden', cond !== 'physical');
+
+            updateSimulation();
+        }
+
+        function updateSimulation() {
+            const batchSize = parseInt(document.getElementById('batchSlider').value, 10);
+            const profile = SIMULATION_PROFILES[currentCondition];
+
+            document.getElementById('batchCountLabel').textContent = `${batchSize.toLocaleString('en-IN')} Panels`;
+
+            // Update SVG header & summary card
+            document.getElementById('svgSubtitle').textContent = profile.subtitle;
+            const pill = document.getElementById('laserStatusPill');
+            pill.textContent = profile.pillText;
+            pill.className = profile.pillClass;
+
+            const actionBox = document.getElementById('actionSummaryBox');
+            actionBox.className = profile.actionBoxClass;
+            const actionTitle = document.getElementById('actionTitle');
+            actionTitle.className = profile.actionTitleClass;
+            actionTitle.textContent = profile.actionTitle;
+            document.getElementById('actionDesc').textContent = profile.actionDesc;
+
+            // Compute scaled batch financials in INR
+            const dynGross = batchSize * profile.dynGrossPerPanel;
+            const dynCost = batchSize * profile.dynCostPerPanel;
+            const dynNet = dynGross - dynCost;
+
+            const statGross = batchSize * profile.statGrossPerPanel;
+            const statCost = batchSize * profile.statCostPerPanel;
+            const statNet = statGross - statCost;
+
+            const netAdvantage = dynNet - statNet;
+            const maxScale = batchSize * 1600; // ₹1,600/panel reference ceiling
+
+            document.getElementById('dynValueText').textContent = formatINR(dynGross);
+            document.getElementById('dynCostText').textContent = formatINR(dynCost);
+            document.getElementById('statValueText').textContent = formatINR(statGross);
+            document.getElementById('statCostText').textContent = formatINR(statCost);
+            document.getElementById('netGainBadge').textContent = formatINR(netAdvantage, true);
+
+            const dynUnitMargin = profile.dynGrossPerPanel - profile.dynCostPerPanel;
+            const statUnitMargin = profile.statGrossPerPanel - profile.statCostPerPanel;
+            document.getElementById('unitMarginPill').textContent =
+                `Net Margin: ${formatINR(dynUnitMargin, true)}/panel vs ${formatINR(statUnitMargin, true)}/panel`;
+
+            document.getElementById('dynNetProfitText').textContent = formatINR(dynNet, true);
+            document.getElementById('dynUnitProfitNote').textContent = `${formatINR(dynUnitMargin, true)} net / module`;
+
+            document.getElementById('statNetProfitText').textContent = formatINR(statNet, true);
+            document.getElementById('statUnitProfitNote').textContent = `${formatINR(statUnitMargin, true)} net / module`;
+
+            document.getElementById('dynValueBar').style.width = `${Math.min(100, Math.round((dynGross / maxScale) * 100))}%`;
+            document.getElementById('statValueBar').style.width = `${Math.min(100, Math.round((statGross / maxScale) * 100))}%`;
+
+            // Material percentages
+            document.getElementById('dynGlassPct').textContent = profile.dynGlassPct;
+            document.getElementById('dynGlassNote').textContent = profile.dynGlassNote;
+
+            // Energy & INR electricity savings (@ ₹10/kWh)
+            const totalKwh = Math.round(batchSize * profile.energySavedPerPanel);
+            const inrSaved = totalKwh * 10;
+            document.getElementById('energySavedText').textContent = `${totalKwh.toLocaleString('en-IN')} kWh`;
+            document.getElementById('energyRupeeText').textContent = `${formatINR(inrSaved)} saved`;
+            document.getElementById('energyNote').textContent = profile.energyNote;
+
+            document.getElementById('rfScoreText').textContent = profile.rfYield;
+            document.getElementById('simLaserW').textContent = profile.laserW;
+        }
+
+        // Initialize on load
+        window.addEventListener('DOMContentLoaded', () => {
+            setCondition('clean');
+        });
+    </script>
+</body>
+</html>
